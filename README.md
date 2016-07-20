@@ -36,8 +36,9 @@ No `require` !
 Just call in your app.js:
 
 ```javascript
-["screenon screenoff paused resumed"].split(' ').forEach(function(event){
-    Ti.App.addEventListener(event, function(e) {
-    console.log(event);
+["screenon screenoff paused resumed"].split(' ').forEach(function(eventName){
+    Ti.App.addEventListener(eventName, function() {
+        console.log(arguments[0]);
+    });
 });
 ```
