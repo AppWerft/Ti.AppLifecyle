@@ -1,0 +1,11 @@
+.apt_generated
+.classpath
+.gitgnore
+.project
+.settings
+CHANGELOG.txt
+LICENSE
+LICENSE.txt
+android/build
+assets
+example

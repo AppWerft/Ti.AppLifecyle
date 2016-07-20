@@ -1,0 +1,16 @@
+%define lookup-function-name lookupGeneratedInit
+%define class-name ApplifecycleBindings
+%{
+
+#include <string.h>
+#include <v8.h>
+#include <KrollBindings.h>
+
+#include "de.appwerft.applifecycle.ApplifecycleModule.h"
+
+
+%}
+struct titanium::bindings::BindEntry;
+%%
+de.appwerft.applifecycle.ApplifecycleModule, ::de::appwerft::applifecycle::ApplifecycleModule::bindProxy, ::de::appwerft::applifecycle::ApplifecycleModule::dispose
+%%
