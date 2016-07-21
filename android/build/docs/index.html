@@ -1,22 +1,25 @@
-<h1>applifecycle Module</h1>
-<h2>Description</h2>
-<p>TODO: Enter your module description here</p>
-<h2>Accessing the applifecycle Module</h2>
-<p>To access this module from JavaScript, you would do the following:</p>
-<pre><code>var applifecycle = require("de.appwerft.applifecycle");
-</code></pre>
-<p>The applifecycle variable is a reference to the Module object.</p>
-<h2>Reference</h2>
-<p>TODO: If your module has an API, you should document
-the reference here.</p>
-<h3>applifecycle.function</h3>
-<p>TODO: This is an example of a module function.</p>
-<h3>applifecycle.property</h3>
-<p>TODO: This is an example of a module property.</p>
+<h1>Ti.AppLifecycle</h1>
+<p>This is a Titanium module for detecting some app events:</p>
+<h2>paused</h2>
+<p>The user has left the app. I.e. by calling launch screen or starting a new activity from app.</p>
+<h2>resumed</h2>
+<p>The user comes back</p>
+<h2>screenoff</h2>
+<p>"The screen is black" (Button Power off)</p>
+<h2>screenon</h2>
+<p>Screen reopened</p>
+<p>You can specify the test interval (in ms) in tiapp.xml:</p>
+<p><code>xml
+&lt;property name="LIFECYCLE_TESTINTERVAL" type="int"&gt;200&lt;/property&gt;</code></p>
+<p>This test interval is only for <code>paused</code> and <code>resumed</code>. Screen events are event triggered.</p>
 <h2>Usage</h2>
-<p>TODO: Enter your usage example here</p>
-<h2>Author</h2>
-<p>TODO: Enter your author name, email and other contact
-details you want to share here.</p>
-<h2>License</h2>
-<p>TODO: Enter your license/legal information here.</p>
+<p>You have only to include in tiapp.xml:
+<code>xml
+&lt;module platform="android"&gt;de.appwerft.applifecycle&lt;/module&gt;</code></p>
+<p>No <code>require</code> !</p>
+<p>Just call in your app.js:</p>
+<p><code>javascript
+["screenon screenoff paused resumed"].split(' ').forEach(function(event){
+    Ti.App.addEventListener(event, function(e) {
+    console.log(event);
+});</code></p>

@@ -29,8 +29,10 @@ import android.content.IntentFilter;
 @Kroll.module(name = "Applifecycle", id = "de.appwerft.applifecycle")
 public class ApplifecycleModule extends KrollModule {
 	private static final String LCAT = "ALifeCycle";
-	static Timer cronJob = null;
+	static Timer cronJob = new Timer();
 	static Boolean wasInForeGround = true;
+	static String lastPackageName = "";
+
 	public Boolean screenOn = true;
 	static public Boolean FIRE_EVENT_ENABLED = false;
 	public Boolean wasScreenOn = true;
@@ -58,19 +60,14 @@ public class ApplifecycleModule extends KrollModule {
 
 	@Kroll.onAppCreate
 	public static void onAppCreate(final TiApplication app) {
-
 		appProperties = TiApplication.getInstance().getAppProperties();
 		testInterval = appProperties.getInt("LIFECYCLE_TESTINTERVAL", 1000);
-
-		Log.d(LCAT,
-				"this module fires this event against Ti.App: 'screenon','screenoff', 'paused', 'resumed' ");
 		mApp = app;
 		Context context = TiApplication.getInstance().getApplicationContext();
 		final IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
 		filter.addAction(Intent.ACTION_SCREEN_OFF);
 		mReceiver = new ScreenReceiver();
 		context.registerReceiver(mReceiver, filter);
-		cronJob = new Timer();
 
 		cronJob.scheduleAtFixedRate(new TimerTask() {
 			@Override
@@ -78,7 +75,8 @@ public class ApplifecycleModule extends KrollModule {
 				boolean isInFront = false;
 				TaskTestResult result = isInForeground();
 				isInFront = result.getIsForground();
-				if (isInFront != wasInForeGround) {
+				if (isInFront != wasInForeGround
+						|| lastPackageName != result.getPackageName()) {
 					Log.d(LCAT,
 							"new top package name: >>>>>>>>> "
 									+ result.getPackageName());
@@ -91,6 +89,7 @@ public class ApplifecycleModule extends KrollModule {
 					Log.d(LCAT, key);
 					wasInForeGround = isInFront;
 				}
+
 			}
 		}, 0, testInterval);
 	}

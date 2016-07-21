@@ -1,39 +1,43 @@
-# applifecycle Module
+#Ti.AppLifecycle
 
-## Description
+This is a Titanium module for detecting some app events:
 
-TODO: Enter your module description here
+##paused
+The user has left the app. I.e. by calling launch screen or starting a new activity from app.
 
-## Accessing the applifecycle Module
+##resumed
+The user comes back
 
-To access this module from JavaScript, you would do the following:
+##screenoff
+"The screen is black" (Button Power off)
 
-    var applifecycle = require("de.appwerft.applifecycle");
+##screenon
+Screen reopened
 
-The applifecycle variable is a reference to the Module object.
 
-## Reference
+You can specify the test interval (in ms) in tiapp.xml:
 
-TODO: If your module has an API, you should document
-the reference here.
+```xml
+<property name="LIFECYCLE_TESTINTERVAL" type="int">200</property>
+```
 
-### applifecycle.function
 
-TODO: This is an example of a module function.
+This test interval is only for `paused` and `resumed`. Screen events are event triggered.
 
-### applifecycle.property
+##Usage
 
-TODO: This is an example of a module property.
+You have only to include in tiapp.xml:
+```xml
+<module platform="android">de.appwerft.applifecycle</module>
+```
 
-## Usage
+No `require` !
 
-TODO: Enter your usage example here
+Just call in your app.js:
 
-## Author
-
-TODO: Enter your author name, email and other contact
-details you want to share here.
-
-## License
-
-TODO: Enter your license/legal information here.
+```javascript
+["screenon screenoff paused resumed"].split(' ').forEach(function(event){
+    Ti.App.addEventListener(event, function(e) {
+    console.log(event);
+});
+```
