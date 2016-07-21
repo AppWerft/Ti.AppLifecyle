@@ -38,8 +38,10 @@ public class ApplifecycleModule extends KrollModule {
 	public Boolean wasScreenOn = true;
 	static TiApplication mApp;
 	private static BroadcastReceiver mReceiver = null;
-	private static TiProperties appProperties;
-	private static int testInterval = 1000;
+	private static TiProperties appProperties = TiApplication.getInstance()
+			.getAppProperties();
+	private static int testInterval = appProperties.getInt(
+			"LIFECYCLE_TESTINTERVAL", 1000);
 
 	public ApplifecycleModule() {
 		super();
@@ -60,21 +62,22 @@ public class ApplifecycleModule extends KrollModule {
 
 	@Kroll.onAppCreate
 	public static void onAppCreate(final TiApplication app) {
-		appProperties = TiApplication.getInstance().getAppProperties();
-		testInterval = appProperties.getInt("LIFECYCLE_TESTINTERVAL", 1000);
 		mApp = app;
 		Context context = TiApplication.getInstance().getApplicationContext();
-		final IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
-		filter.addAction(Intent.ACTION_SCREEN_OFF);
+
+		/* Preparing of broadcatsReceiver for screenchanging */
+		final IntentFilter intentFilter = new IntentFilter(
+				Intent.ACTION_SCREEN_ON);
+		intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
 		mReceiver = new ScreenReceiver();
-		context.registerReceiver(mReceiver, filter);
+		context.registerReceiver(mReceiver, intentFilter);
 
 		cronJob.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
 				boolean isInFront = false;
 				TaskTestResult result = isInForeground();
-				isInFront = result.getIsForground();
+				isInFront = result.getIsForeground();
 				if (isInFront != wasInForeGround
 						|| lastPackageName != result.getPackageName()) {
 					Log.d(LCAT,
@@ -89,7 +92,6 @@ public class ApplifecycleModule extends KrollModule {
 					Log.d(LCAT, key);
 					wasInForeGround = isInFront;
 				}
-
 			}
 		}, 0, testInterval);
 	}
