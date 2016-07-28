@@ -34,14 +34,15 @@ public class ApplifecycleModule extends KrollModule {
 	static String lastPackageName = "";
 
 	public Boolean screenOn = true;
-	static public Boolean FIRE_EVENT_ENABLED = false;
 	public Boolean wasScreenOn = true;
 	static TiApplication mApp;
 	private static BroadcastReceiver mReceiver = null;
 	private static TiProperties appProperties = TiApplication.getInstance()
 			.getAppProperties();
-	private static int testInterval = appProperties.getInt(
-			"LIFECYCLE_TESTINTERVAL", 1000);
+	private static int testIntervalForeground = appProperties.getInt(
+			"LIFECYCLE_TESTINTERVAL", 100);
+	private static int testIntervalBackground = appProperties.getInt(
+			"LIFECYCLE_TESTINTERVAL_BACKGROUND", 500);
 
 	public ApplifecycleModule() {
 		super();
@@ -50,13 +51,10 @@ public class ApplifecycleModule extends KrollModule {
 	public static void onScreenChanged(Boolean screenstate) {
 		KrollDict dict = new KrollDict();
 		String key = (screenstate == true) ? "screenon" : "screenoff";
-		Log.d(LCAT, key);
-		if (FIRE_EVENT_ENABLED == true)
-			mApp.fireAppEvent(key, dict);
-
+		mApp.fireAppEvent(key, dict);
 	}
 
-	public static void onAppDestroy(final TiApplication app) {
+	public static void onAppStop(final TiApplication app) {
 		cronJob.cancel();
 	}
 
@@ -80,20 +78,14 @@ public class ApplifecycleModule extends KrollModule {
 				isInFront = result.getIsForeground();
 				if (isInFront != wasInForeGround
 						|| lastPackageName != result.getPackageName()) {
-					Log.d(LCAT,
-							"new top package name: >>>>>>>>> "
-									+ result.getPackageName());
 					String key = (isInFront == true) ? "resumed" : "paused";
-					if (FIRE_EVENT_ENABLED == true) {
-						KrollDict dict = new KrollDict();
-						dict.put("packageName", result.getPackageName());
-						mApp.fireAppEvent(key, dict);
-					}
-					Log.d(LCAT, key);
+					KrollDict dict = new KrollDict();
+					dict.put("packageName", result.getPackageName());
+					mApp.fireAppEvent(key, dict);
 					wasInForeGround = isInFront;
 				}
 			}
-		}, 0, testInterval);
+		}, 0, testIntervalForeground);
 	}
 
 	static public TaskTestResult isInForeground() {
