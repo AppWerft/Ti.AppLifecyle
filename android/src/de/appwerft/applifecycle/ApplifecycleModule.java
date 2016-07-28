@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutionException;
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.annotations.Kroll;
-import org.appcelerator.kroll.common.Log;
+
 import org.appcelerator.titanium.TiApplication;
 
 import android.content.BroadcastReceiver;
@@ -28,7 +28,6 @@ import android.content.IntentFilter;
 
 @Kroll.module(name = "Applifecycle", id = "de.appwerft.applifecycle")
 public class ApplifecycleModule extends KrollModule {
-	private static final String LCAT = "ALifeCycle";
 	static Timer cronJob = new Timer();
 	static Boolean wasInForeGround = true;
 	static String lastPackageName = "";
