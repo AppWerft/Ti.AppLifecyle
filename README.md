@@ -49,4 +49,8 @@ In the app you will receive the events through `Ti.App.addEventListener()` as sh
         console.log(arguments[0]);
     });
 });
+
+// static pull:
+require("de.appwerft.applifecycle").isInForeGround();  // true/false
+
 ```

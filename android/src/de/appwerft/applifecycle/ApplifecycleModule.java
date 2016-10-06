@@ -29,12 +29,13 @@ import android.content.IntentFilter;
 @Kroll.module(name = "Applifecycle", id = "de.appwerft.applifecycle")
 public class ApplifecycleModule extends KrollModule {
 	static Timer cronJob = new Timer();
-	static Boolean wasInForeGround = true;
+	static Boolean wasInFront = true;
 	static String lastPackageName = "";
 
 	public Boolean screenOn = true;
 	public Boolean wasScreenOn = true;
 	static TiApplication mApp;
+	public static long counter = 0;
 	private static BroadcastReceiver mReceiver = null;
 	private static TiProperties appProperties = TiApplication.getInstance()
 			.getAppProperties();
@@ -50,7 +51,8 @@ public class ApplifecycleModule extends KrollModule {
 	public static void onScreenChanged(Boolean screenstate) {
 		KrollDict dict = new KrollDict();
 		String key = (screenstate == true) ? "screenon" : "screenoff";
-		mApp.fireAppEvent(key, dict);
+		if (wasInFront == true)
+			mApp.fireAppEvent(key, dict);
 	}
 
 	public static void onAppStop(final TiApplication app) {
@@ -61,7 +63,6 @@ public class ApplifecycleModule extends KrollModule {
 	public static void onAppCreate(final TiApplication app) {
 		mApp = app;
 		Context context = TiApplication.getInstance().getApplicationContext();
-
 		/* Preparing of broadcatsReceiver for screenchanging */
 		final IntentFilter intentFilter = new IntentFilter(
 				Intent.ACTION_SCREEN_ON);
@@ -72,22 +73,28 @@ public class ApplifecycleModule extends KrollModule {
 		cronJob.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
-				boolean isInFront = false;
-				TaskTestResult result = isInForeground();
-				isInFront = result.getIsForeground();
-				if (isInFront != wasInForeGround
-						|| lastPackageName != result.getPackageName()) {
-					String key = (isInFront == true) ? "resumed" : "paused";
-					KrollDict dict = new KrollDict();
-					dict.put("packageName", result.getPackageName());
-					mApp.fireAppEvent(key, dict);
-					wasInForeGround = isInFront;
+				counter++;
+				if (counter % 5 == 0 || wasInFront) {
+					TaskTestResult result = _isInForeground();
+					boolean isInFront = result.getIsForeground();
+					if (isInFront != wasInFront) {
+						String key = (isInFront == true) ? "resumed" : "paused";
+						KrollDict dict = new KrollDict();
+						dict.put("packageName", result.getPackageName());
+						mApp.fireAppEvent(key, dict);
+						wasInFront = isInFront;
+					}
 				}
 			}
 		}, 0, testIntervalForeground);
 	}
 
-	static public TaskTestResult isInForeground() {
+	@Kroll.method
+	public boolean isInForeground() {
+		return AppStateListener.oneActivityIsResumed;
+	}
+
+	static public TaskTestResult _isInForeground() {
 		try {
 			TaskTestResult result = new ForegroundCheckTask().execute(
 					TiApplication.getInstance().getApplicationContext()).get();
