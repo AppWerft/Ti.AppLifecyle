@@ -20,6 +20,8 @@ package de.appwerft.applifecycle;
  * Code borrowed from gcm.js: https://github.com/iamyellow/gcm.js/blob/master/src/net/iamyellow/gcmjs/AppStateListener.java
  */
 
+import org.appcelerator.kroll.KrollDict;
+import org.appcelerator.titanium.TiApplication;
 import org.appcelerator.titanium.TiApplication.ActivityTransitionListener;
 
 public class AppStateListener implements ActivityTransitionListener {
@@ -29,5 +31,8 @@ public class AppStateListener implements ActivityTransitionListener {
 	@Override
 	public void onActivityTransition(boolean state) {
 		oneActivityIsResumed = !state;
+		KrollDict dict = new KrollDict();
+		dict.put("activity", state);
+		TiApplication.getInstance().fireAppEvent("foreground", dict);
 	}
 }
