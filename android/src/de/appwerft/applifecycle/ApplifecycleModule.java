@@ -35,9 +35,7 @@ public class ApplifecycleModule extends KrollModule {
 	public Boolean screenOn = true;
 	public Boolean wasScreenOn = true;
 	static TiApplication mApp;
-	ApplifecycleModule instance;
 	public static long counter = 0;
-	private static AppStateListener appStateListener = null;
 	private static BroadcastReceiver mReceiver = null;
 	private static TiProperties appProperties = TiApplication.getInstance()
 			.getAppProperties();
@@ -48,11 +46,6 @@ public class ApplifecycleModule extends KrollModule {
 
 	public ApplifecycleModule() {
 		super();
-		instance = this;
-		if (appStateListener == null) {
-			appStateListener = new AppStateListener();
-			TiApplication.addActivityTransitionListener(appStateListener);
-		}
 	}
 
 	public static void onScreenChanged(Boolean screenstate) {
@@ -67,16 +60,15 @@ public class ApplifecycleModule extends KrollModule {
 	}
 
 	@Kroll.onAppCreate
-	public void onAppCreate(final TiApplication app) {
+	public static void onAppCreate(final TiApplication app) {
 		mApp = app;
-
-		Context ctx = TiApplication.getInstance().getApplicationContext();
+		Context context = TiApplication.getInstance().getApplicationContext();
 		/* Preparing of broadcatsReceiver for screenchanging */
 		final IntentFilter intentFilter = new IntentFilter(
 				Intent.ACTION_SCREEN_ON);
 		intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
 		mReceiver = new ScreenReceiver();
-		ctx.registerReceiver(mReceiver, intentFilter);
+		context.registerReceiver(mReceiver, intentFilter);
 
 		cronJob.scheduleAtFixedRate(new TimerTask() {
 			@Override
@@ -115,5 +107,4 @@ public class ApplifecycleModule extends KrollModule {
 			return null;
 		}
 	}
-
 }
